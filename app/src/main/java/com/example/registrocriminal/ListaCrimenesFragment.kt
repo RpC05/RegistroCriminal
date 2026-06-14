@@ -9,9 +9,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.registrocriminal.databinding.FragmentListaCrimenesBinding
 import kotlinx.coroutines.launch
+import androidx.core.os.bundleOf
 
 class ListaCrimenesFragment : Fragment() {
 
@@ -36,7 +38,17 @@ class ListaCrimenesFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 listaCrimenesViewModel.crimenes.collect { crimenes ->
-                    binding.crimenRecyclerView.adapter = CrimenAdapter(crimenes)
+
+                    // Nombramos la variable que recibimos como 'crimenId'
+                    binding.crimenRecyclerView.adapter = CrimenAdapter(crimenes) { crimenId ->
+
+                        // En vez de usar Directions (SafeArgs), empaquetamos el ID nativamente
+                        val paquete = bundleOf("crimenId" to crimenId)
+
+                        // Navegamos usando nuestra acción y enviándole el paquete
+                        findNavController().navigate(R.id.mostrar_crimen, paquete)
+
+                    }
                 }
             }
         }

@@ -2,12 +2,18 @@ package com.example.registrocriminal
 
 import android.content.Context
 import androidx.room.Room
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 private const val DATABASE_NAME = "crimen-database"
 
-class CrimenRepository private constructor(context: Context) {
+class CrimenRepository private constructor(
+    context: Context,
+    private val coroutineScope: CoroutineScope = GlobalScope
+) {
 
     private val database = Room.databaseBuilder(
             context.applicationContext,
@@ -21,6 +27,12 @@ class CrimenRepository private constructor(context: Context) {
 
     suspend fun ingresarCrimen(crimen: Crimen) {
         database.crimenDAO().ingresarCrimen(crimen)
+    }
+
+    fun actualizarCrimen(crimen: Crimen) {
+        coroutineScope.launch {
+            database.crimenDAO().actualizarCrimen(crimen)
+        }
     }
 
     companion object {

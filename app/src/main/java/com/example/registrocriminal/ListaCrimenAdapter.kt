@@ -6,13 +6,15 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.registrocriminal.databinding.ListItemCrimenBinding
 import com.example.registrocriminal.databinding.ListItemCrimenMayorBinding
-
 import android.view.View
+import java.util.UUID // Importante añadir esto
 
 class CrimenHolder(
     private val binding: ListItemCrimenBinding
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun enlazar(crimen: Crimen) {
+
+    // 1. Cambiamos la función para que acepte un UUID
+    fun enlazar(crimen: Crimen, onCrimenPulsado: (UUID) -> Unit) {
         val formatter = java.text.SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", java.util.Locale.getDefault())
         binding.tituloCrimen.text = crimen.titulo
         binding.fechaCrimen.text = formatter.format(crimen.fecha)
@@ -21,8 +23,10 @@ class CrimenHolder(
         } else {
             View.GONE
         }
+
+        // 2. Pasamos el ID del crimen que acabamos de tocar
         binding.root.setOnClickListener {
-            Toast.makeText(binding.root.context, "${crimen.titulo}", Toast.LENGTH_LONG).show()
+            onCrimenPulsado(crimen.id)
         }
     }
 }
@@ -30,13 +34,18 @@ class CrimenHolder(
 class CrimenMayorHolder(
     private val binding: ListItemCrimenMayorBinding
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun enlazar(crimen: Crimen) {
+
+    // 1. Cambiamos la función para que acepte un UUID
+    fun enlazar(crimen: Crimen, onCrimenPulsado: (UUID) -> Unit) {
         val formatter = java.text.SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", java.util.Locale.getDefault())
         binding.tituloCrimen.text = crimen.titulo
         binding.fechaCrimen.text = formatter.format(crimen.fecha)
+
+        // 2. Pasamos el ID del crimen que acabamos de tocar
         binding.root.setOnClickListener {
-            Toast.makeText(binding.root.context, "${crimen.titulo}", Toast.LENGTH_LONG).show()
+            onCrimenPulsado(crimen.id)
         }
+
         binding.botonPolicia.setOnClickListener {
             Toast.makeText(binding.root.context, "Llamando a la policía para ${crimen.titulo}", Toast.LENGTH_SHORT).show()
         }
@@ -44,7 +53,9 @@ class CrimenMayorHolder(
 }
 
 class CrimenAdapter(
-    private val crimenes: List<Crimen>
+    private val crimenes: List<Crimen>,
+    // 3. Actualizamos la firma en el constructor principal
+    private val onCrimenPulsado: (UUID) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemViewType(position: Int): Int {
@@ -67,8 +78,8 @@ class CrimenAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val crimen = crimenes[position]
         when (holder) {
-            is CrimenHolder -> holder.enlazar(crimen)
-            is CrimenMayorHolder -> holder.enlazar(crimen)
+            is CrimenHolder -> holder.enlazar(crimen, onCrimenPulsado)
+            is CrimenMayorHolder -> holder.enlazar(crimen, onCrimenPulsado)
         }
     }
 }

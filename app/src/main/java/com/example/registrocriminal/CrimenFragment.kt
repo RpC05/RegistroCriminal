@@ -4,41 +4,37 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.widget.doOnTextChanged
+import androidx.core.widget.doOnTextChanged // ¡Muy importante que esta línea esté aquí!
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.registrocriminal.databinding.FragmentCrimenBinding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.registrocriminal.databinding.FragmentCrimenBinding
 import kotlinx.coroutines.launch
-import java.util.Date
 import java.util.UUID
 
 class CrimenFragment : Fragment() {
 
-    private lateinit var crimen: Crimen
-    private val listaCrimenesViewModel: ListaCrimenesViewModel by viewModels()
-
-    // 1. Declaramos _binding como nullable (?) y lo iniciamos en null
+    private val crimenViewModel: CrimenViewModel by viewModels()
     private var _binding: FragmentCrimenBinding? = null
-
-    // 2. Creamos un "get()" seguro. checkNotNull lanza error si intentamos usar la vista cuando ya se destruyó
     private val binding
         get() = checkNotNull(_binding) {
-            "No se puede acceder al binding porque es nulo. ¿Está la vista visible?"
+            "No se puede acceder al binding..."
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        crimen = Crimen(id = UUID.randomUUID(), titulo = "", fecha = Date(), resuelto = false)
+        val crimenId = arguments?.getSerializable("crimenId") as? UUID
+        crimenId?.let {
+            crimenViewModel.cargarCrimen(it)
+        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // 3. Asignamos la vista inflada a la variable _binding
+    ): View {
         _binding = FragmentCrimenBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -46,31 +42,50 @@ class CrimenFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Opcional (Diapo 26): Ingresar un dato duro de prueba si la base está vacía
-        viewLifecycleOwner.lifecycleScope.launch {
-            // Puedes comentar esto luego de correr la app la primera vez para no llenar tu DB
-            /*
-            listaCrimenesViewModel.ingresarCrimen(Crimen(
-                id = UUID.randomUUID(),
-                titulo = "Impresora dañada",
-                fecha = Date(),
-                resuelto = false,
-                crimenMayor = true
-            ))
-            */
+        // --- 1. NUEVO CÓDIGO (Diapositiva): Escuchamos las acciones del usuario ---
+        binding.apply {
+
+            // Si el usuario escribe o borra algo en el título...
+            txtTituloCrimen.doOnTextChanged { texto, _, _, _ ->
+                crimenViewModel.actualizarCrimen { anterior ->
+                    anterior.copy(titulo = texto.toString())
+                }
+            }
+
+            // Desactivamos el botón de fecha (seguramente la guía te hará usarlo luego)
+            btnFechaCrimen.apply {
+                isEnabled = false
+            }
+
+            // Si el usuario marca o desmarca la casilla de "Resuelto"...
+            chkCrimenResuelto.setOnCheckedChangeListener { _, seleccionado ->
+                crimenViewModel.actualizarCrimen { anterior ->
+                    anterior.copy(resuelto = seleccionado)
+                }
+            }
         }
 
+        // --- 2. LO QUE YA TENÍAMOS: Reflejamos los cambios visualmente ---
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                listaCrimenesViewModel.crimenes.collect { crimenes ->
-                    // Aquí actualizas tu adaptador con la nueva lista que viene de la BD
-                    // binding.crimenRecyclerView.adapter = ListaCrimenAdapter(crimenes)
+                crimenViewModel.crimen.collect { crimen ->
+                    crimen?.let { actualizarUI(it) }
                 }
             }
         }
     }
 
-    // 4. ¡Lo más importante! Limpiamos la memoria cuando la vista se destruye
+    private fun actualizarUI(crimen: Crimen) {
+        binding.apply {
+            // El 'if' evita un bucle infinito al momento de actualizar el texto
+            if (txtTituloCrimen.text.toString() != crimen.titulo) {
+                txtTituloCrimen.setText(crimen.titulo)
+            }
+            btnFechaCrimen.text = crimen.fecha.toString()
+            chkCrimenResuelto.isChecked = crimen.resuelto
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
