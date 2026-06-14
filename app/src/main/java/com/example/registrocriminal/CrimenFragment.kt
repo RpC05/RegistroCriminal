@@ -6,13 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.registrocriminal.databinding.FragmentCrimenBinding
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.UUID
 
 class CrimenFragment : Fragment() {
 
     private lateinit var crimen: Crimen
+    private val listaCrimenesViewModel: ListaCrimenesViewModel by viewModels()
 
     // 1. Declaramos _binding como nullable (?) y lo iniciamos en null
     private var _binding: FragmentCrimenBinding? = null
@@ -40,18 +46,26 @@ class CrimenFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.apply {
-            txtTituloCrimen.doOnTextChanged { texto, _, _, _ ->
-                crimen = crimen.copy(titulo = texto.toString())
-            }
+        // Opcional (Diapo 26): Ingresar un dato duro de prueba si la base está vacía
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Puedes comentar esto luego de correr la app la primera vez para no llenar tu DB
+            /*
+            listaCrimenesViewModel.ingresarCrimen(Crimen(
+                id = UUID.randomUUID(),
+                titulo = "Impresora dañada",
+                fecha = Date(),
+                resuelto = false,
+                crimenMayor = true
+            ))
+            */
+        }
 
-            btnFechaCrimen.apply {
-                text = crimen.fecha.toString()
-                isEnabled = false
-            }
-
-            chkCrimenResuelto.setOnCheckedChangeListener { _, seleccionado ->
-                crimen = crimen.copy(resuelto = seleccionado)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                listaCrimenesViewModel.crimenes.collect { crimenes ->
+                    // Aquí actualizas tu adaptador con la nueva lista que viene de la BD
+                    // binding.crimenRecyclerView.adapter = ListaCrimenAdapter(crimenes)
+                }
             }
         }
     }

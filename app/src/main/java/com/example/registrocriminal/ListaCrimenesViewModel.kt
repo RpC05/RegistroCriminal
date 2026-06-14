@@ -1,23 +1,28 @@
 package com.example.registrocriminal
 
 import androidx.lifecycle.ViewModel
-import java.util.Date
-import java.util.UUID
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class ListaCrimenesViewModel : ViewModel() {
 
-    val crimenes = mutableListOf<Crimen>()
+    private val crimenRepository = CrimenRepository.get()
+
+    private val _crimenes: MutableStateFlow<List<Crimen>> = MutableStateFlow(emptyList())
+    val crimenes: StateFlow<List<Crimen>> get() = _crimenes.asStateFlow()
 
     init {
-        for (i in 0 until 100) {
-            val crimen = Crimen(
-                id = UUID.randomUUID(),
-                titulo = "Crimen # $i",
-                fecha = Date(),
-                resuelto = i % 2 == 0,
-                crimenMayor = i % 3 == 0
-            )
-            crimenes.add(crimen)
+        viewModelScope.launch {
+            crimenRepository.getCrimenes().collect {
+                _crimenes.value = it
+            }
         }
+    }
+
+    suspend fun ingresarCrimen(crimen: Crimen) {
+        crimenRepository.ingresarCrimen(crimen)
     }
 }
