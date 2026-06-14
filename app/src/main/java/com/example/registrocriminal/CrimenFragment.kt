@@ -13,6 +13,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.registrocriminal.databinding.FragmentCrimenBinding
 import kotlinx.coroutines.launch
 import java.util.UUID
+import androidx.activity.OnBackPressedCallback
+import androidx.navigation.fragment.findNavController
+import android.widget.Toast
 
 class CrimenFragment : Fragment() {
 
@@ -41,6 +44,20 @@ class CrimenFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // --- DESAFÍO: Evitar que el usuario regrese si el título está en blanco ---
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (binding.txtTituloCrimen.text.toString().isNotBlank()) {
+                    // Si no está en blanco, navegamos hacia atrás manualmente
+                    findNavController().popBackStack()
+                } else {
+                    // Si está en blanco, avisamos al usuario y no hacemos nada más (evitamos salir)
+                    Toast.makeText(requireContext(), "El título no puede estar en blanco", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
 
         // --- 1. NUEVO CÓDIGO (Diapositiva): Escuchamos las acciones del usuario ---
         binding.apply {
