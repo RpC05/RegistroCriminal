@@ -37,7 +37,7 @@ android {
 
 // Desafío de la Diapo 33 para KSP
 ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
+    arg("room.schemaLocation", "${projectDir}/schemas")
 }
 
 dependencies {

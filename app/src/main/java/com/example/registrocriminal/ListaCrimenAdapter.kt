@@ -7,12 +7,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.registrocriminal.databinding.ListItemCrimenBinding
 import com.example.registrocriminal.databinding.ListItemCrimenMayorBinding
 
+import android.view.View
+
 class CrimenHolder(
     private val binding: ListItemCrimenBinding
 ) : RecyclerView.ViewHolder(binding.root) {
     fun enlazar(crimen: Crimen) {
+        val formatter = java.text.SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", java.util.Locale.getDefault())
         binding.tituloCrimen.text = crimen.titulo
-        binding.fechaCrimen.text = crimen.fecha.toString()
+        binding.fechaCrimen.text = formatter.format(crimen.fecha)
+        binding.imvResuelto.visibility = if (crimen.resuelto) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
         binding.root.setOnClickListener {
             Toast.makeText(binding.root.context, "${crimen.titulo}", Toast.LENGTH_LONG).show()
         }
@@ -23,8 +31,9 @@ class CrimenMayorHolder(
     private val binding: ListItemCrimenMayorBinding
 ) : RecyclerView.ViewHolder(binding.root) {
     fun enlazar(crimen: Crimen) {
+        val formatter = java.text.SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", java.util.Locale.getDefault())
         binding.tituloCrimen.text = crimen.titulo
-        binding.fechaCrimen.text = crimen.fecha.toString()
+        binding.fechaCrimen.text = formatter.format(crimen.fecha)
         binding.root.setOnClickListener {
             Toast.makeText(binding.root.context, "${crimen.titulo}", Toast.LENGTH_LONG).show()
         }

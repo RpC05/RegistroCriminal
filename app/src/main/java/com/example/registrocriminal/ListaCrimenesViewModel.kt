@@ -16,8 +16,22 @@ class ListaCrimenesViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            crimenRepository.getCrimenes().collect {
-                _crimenes.value = it
+            crimenRepository.getCrimenes().collect { lista ->
+                if (lista.isEmpty()) {
+                    // Generar datos ficticios si la base de datos está vacía
+                    viewModelScope.launch {
+                        for (i in 0 until 100) {
+                            val crimen = Crimen(
+                                titulo = "Evento # $i",
+                                fecha = java.util.Date(),
+                                resuelto = i % 2 == 0,
+                                crimenMayor = i % 3 == 0
+                            )
+                            crimenRepository.ingresarCrimen(crimen)
+                        }
+                    }
+                }
+                _crimenes.value = lista
             }
         }
     }
