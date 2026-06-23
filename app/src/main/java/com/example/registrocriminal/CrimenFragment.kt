@@ -44,6 +44,15 @@ class CrimenFragment : Fragment() {
                 }
             }
         }
+
+        setFragmentResultListener(TimePickerFragment.CLAVE_TIEMPO_SOLICITADO) { _, bundle ->
+            val result = bundle.getSerializable(TimePickerFragment.CLAVE_TIEMPO_SOLICITADO) as? Date
+            if (result != null) {
+                crimenViewModel.actualizarCrimen { anterior ->
+                    anterior.copy(fecha = result)
+                }
+            }
+        }
     }
 
     override fun onCreateView(
@@ -57,32 +66,25 @@ class CrimenFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // --- DESAFÍO: Evitar que el usuario regrese si el título está en blanco ---
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (binding.txtTituloCrimen.text.toString().isNotBlank()) {
-                    // Si no está en blanco, navegamos hacia atrás manualmente
                     findNavController().popBackStack()
                 } else {
-                    // Si está en blanco, avisamos al usuario y no hacemos nada más (evitamos salir)
                     Toast.makeText(requireContext(), "El título no puede estar en blanco", Toast.LENGTH_SHORT).show()
                 }
             }
         }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
 
-        // --- 1. NUEVO CÓDIGO (Diapositiva): Escuchamos las acciones del usuario ---
         binding.apply {
 
-            // Si el usuario escribe o borra algo en el título...
             txtTituloCrimen.doOnTextChanged { texto, _, _, _ ->
                 crimenViewModel.actualizarCrimen { anterior ->
                     anterior.copy(titulo = texto.toString())
                 }
             }
-            // Quitamos la desactivación del botón de fecha, lo manejaremos en actualizarUI
-            
-            // Si el usuario marca o desmarca la casilla de "Resuelto"...
+
             chkCrimenResuelto.setOnCheckedChangeListener { _, seleccionado ->
                 crimenViewModel.actualizarCrimen { anterior ->
                     anterior.copy(resuelto = seleccionado)
@@ -90,7 +92,6 @@ class CrimenFragment : Fragment() {
             }
         }
 
-        // --- 2. LO QUE YA TENÍAMOS: Reflejamos los cambios visualmente ---
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 crimenViewModel.crimen.collect { crimen ->
@@ -102,14 +103,19 @@ class CrimenFragment : Fragment() {
 
     private fun actualizarUI(crimen: Crimen) {
         binding.apply {
-            // El 'if' evita un bucle infinito al momento de actualizar el texto
             if (txtTituloCrimen.text.toString() != crimen.titulo) {
                 txtTituloCrimen.setText(crimen.titulo)
             }
-            btnFechaCrimen.text = crimen.fecha.toString()
+            btnFechaCrimen.text = android.text.format.DateFormat.format("EEEE, MMM dd, yyyy", crimen.fecha)
             btnFechaCrimen.setOnClickListener {
                 val paquete = bundleOf("fechaCrimen" to crimen.fecha)
                 findNavController().navigate(R.id.selectorFecha, paquete)
+            }
+
+            btnTiempoCrimen.text = android.text.format.DateFormat.format("HH:mm", crimen.fecha)
+            btnTiempoCrimen.setOnClickListener {
+                val paquete = bundleOf("fechaCrimen" to crimen.fecha)
+                findNavController().navigate(R.id.selectorTiempo, paquete)
             }
             chkCrimenResuelto.isChecked = crimen.resuelto
         }

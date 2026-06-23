@@ -34,6 +34,12 @@
         android:layout_height="wrap_content"
         tools:text="Mer Abr 05 14:20 EST 2022"/>
 
+    <Button
+        android:id="@+id/btn_tiempo_crimen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="14:20"/>
+
     <CheckBox
         android:id="@+id/chk_crimen_resuelto"
         android:layout_width="match_parent"
