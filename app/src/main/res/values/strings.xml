@@ -4,4 +4,5 @@
     <string name="etiqueta_titulo_crimen">Título</string>
     <string name="etiqueta_detalle_crimen">Detalle</string>
     <string name="etiqueta_crimen_resuelto">Resuelto</string>
+    <string name="titulo_date_picker">Fecha del crimen</string>
 </resources>

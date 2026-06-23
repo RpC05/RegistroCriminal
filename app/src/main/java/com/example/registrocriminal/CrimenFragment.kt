@@ -6,16 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged // ¡Muy importante que esta línea esté aquí!
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.registrocriminal.databinding.FragmentCrimenBinding
 import kotlinx.coroutines.launch
+import androidx.core.os.bundleOf
 import java.util.UUID
 import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.findNavController
 import android.widget.Toast
+import java.util.Date
 
 class CrimenFragment : Fragment() {
 
@@ -31,6 +34,15 @@ class CrimenFragment : Fragment() {
         val crimenId = arguments?.getSerializable("crimenId") as? UUID
         crimenId?.let {
             crimenViewModel.cargarCrimen(it)
+        }
+
+        setFragmentResultListener(DatePickerFragment.CLAVE_FECHA_SOLICITADA) { _, bundle ->
+            val result = bundle.getSerializable(DatePickerFragment.CLAVE_FECHA_SOLICITADA) as? Date
+            if (result != null) {
+                crimenViewModel.actualizarCrimen { anterior ->
+                    anterior.copy(fecha = result)
+                }
+            }
         }
     }
 
@@ -68,12 +80,8 @@ class CrimenFragment : Fragment() {
                     anterior.copy(titulo = texto.toString())
                 }
             }
-
-            // Desactivamos el botón de fecha (seguramente la guía te hará usarlo luego)
-            btnFechaCrimen.apply {
-                isEnabled = false
-            }
-
+            // Quitamos la desactivación del botón de fecha, lo manejaremos en actualizarUI
+            
             // Si el usuario marca o desmarca la casilla de "Resuelto"...
             chkCrimenResuelto.setOnCheckedChangeListener { _, seleccionado ->
                 crimenViewModel.actualizarCrimen { anterior ->
@@ -99,6 +107,10 @@ class CrimenFragment : Fragment() {
                 txtTituloCrimen.setText(crimen.titulo)
             }
             btnFechaCrimen.text = crimen.fecha.toString()
+            btnFechaCrimen.setOnClickListener {
+                val paquete = bundleOf("fechaCrimen" to crimen.fecha)
+                findNavController().navigate(R.id.selectorFecha, paquete)
+            }
             chkCrimenResuelto.isChecked = crimen.resuelto
         }
     }
