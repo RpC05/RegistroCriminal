@@ -1,8 +1,15 @@
 <resources>
     <string name="app_name">Registro Criminal KT</string>
-    <string name="pista_titulo_crimen">Ingrese un título para el crimen</string>
-    <string name="etiqueta_titulo_crimen">Título</string>
-    <string name="etiqueta_detalle_crimen">Detalle</string>
-    <string name="etiqueta_crimen_resuelto">Resuelto</string>
+    <string name="nuevo_crimen">Nuevo Crimen</string>
+    <string name="mostrar_subtitulo">Mostrar Subtítulos</string>
+    <string name="ocultar_subtitulos">Ocultar Subtitulos</string>
+    <string name="formato_subtitulo">%1$d crimenes</string>
+    <string name="lbl_titulo">Título</string>
+    <string name="lbl_detalle_crimen">Detalles</string>
+    <string name="lbl_crimen_resuelto">Resuelto</string>
+    <string name="pista_titulo">Ingrese título para el crimen</string>
     <string name="titulo_date_picker">Fecha del crimen</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- TODO: Remove or change this placeholder text -->
 </resources>

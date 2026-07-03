@@ -2,7 +2,12 @@ package com.example.registrocriminal
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
+import java.util.Date
+import java.util.UUID
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -21,6 +26,11 @@ class ListaCrimenesFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val listaCrimenesViewModel: ListaCrimenesViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,5 +67,36 @@ class ListaCrimenesFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fragmento_lista_crimenes, menu)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.nuevo_crimen -> {
+                mostraNuevoCrimen()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun mostraNuevoCrimen() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val nuevoCrimen = Crimen(
+                id = UUID.randomUUID(),
+                titulo = "",
+                fecha = Date(),
+                resuelto = false
+            )
+            listaCrimenesViewModel.ingresarCrimen(nuevoCrimen)
+            val paquete = androidx.core.os.bundleOf("crimenId" to nuevoCrimen.id)
+            findNavController().navigate(R.id.mostrar_crimen, paquete)
+        }
     }
 }

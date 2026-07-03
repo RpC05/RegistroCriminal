@@ -11,14 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceHeadline5"
-        android:text="@string/etiqueta_titulo_crimen" />
+        android:text="@string/lbl_titulo" />
 
     <EditText
         android:id="@+id/txt_titulo_crimen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceHeadline5"
-        android:hint="@string/pista_titulo_crimen"
+        android:hint="@string/pista_titulo"
         android:importantForAutofill="no"
         android:inputType="text"/>
 
@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceHeadline5"
-        android:text="@string/etiqueta_detalle_crimen"/>
+        android:text="@string/lbl_detalle_crimen"/>
 
     <Button
         android:id="@+id/btn_fecha_crimen"
@@ -44,6 +44,6 @@
         android:id="@+id/chk_crimen_resuelto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/etiqueta_crimen_resuelto"/>
+        android:text="@string/lbl_crimen_resuelto"/>
 
 </LinearLayout>
