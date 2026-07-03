@@ -2,6 +2,9 @@ package com.example.registrocriminal
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged // ¡Muy importante que esta línea esté aquí!
@@ -31,6 +34,7 @@ class CrimenFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
         val crimenId = arguments?.getSerializable("crimenId") as? UUID
         crimenId?.let {
             crimenViewModel.cargarCrimen(it)
@@ -124,5 +128,25 @@ class CrimenFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fragment_crimen, menu)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.eliminar_crimen -> {
+                crimenViewModel.crimen.value?.let {
+                    crimenViewModel.eliminarCrimen(it)
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }

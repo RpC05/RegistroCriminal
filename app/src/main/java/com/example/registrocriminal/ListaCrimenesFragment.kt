@@ -45,9 +45,21 @@ class ListaCrimenesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.btnAgregarCrimen.setOnClickListener {
+            mostraNuevoCrimen()
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 listaCrimenesViewModel.crimenes.collect { crimenes ->
+
+                    if (crimenes.isEmpty()) {
+                        binding.crimenRecyclerView.visibility = View.GONE
+                        binding.emptyView.visibility = View.VISIBLE
+                    } else {
+                        binding.crimenRecyclerView.visibility = View.VISIBLE
+                        binding.emptyView.visibility = View.GONE
+                    }
 
                     // Nombramos la variable que recibimos como 'crimenId'
                     binding.crimenRecyclerView.adapter = CrimenAdapter(crimenes) { crimenId ->

@@ -30,6 +30,10 @@ class CrimenViewModel : ViewModel() {
         }
     }
 
+    fun eliminarCrimen(crimen: Crimen) {
+        repositorio.eliminarCrimen(crimen)
+    }
+
     override fun onCleared() {
         super.onCleared()
         _crimen.value?.let { repositorio.actualizarCrimen(it) }

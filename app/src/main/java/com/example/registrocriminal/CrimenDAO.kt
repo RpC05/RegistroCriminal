@@ -6,6 +6,7 @@ import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 import androidx.room.Update
+import androidx.room.Delete
 
 @Dao
 interface CrimenDAO {
@@ -20,4 +21,7 @@ interface CrimenDAO {
 
     @Update
     suspend fun actualizarCrimen(crimen: Crimen)
+
+    @Delete
+    suspend fun eliminarCrimen(crimen: Crimen)
 }
