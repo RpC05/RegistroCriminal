@@ -7,7 +7,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.widget.doOnTextChanged // ¡Muy importante que esta línea esté aquí!
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
@@ -28,6 +28,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import android.provider.ContactsContract
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
+import androidx.core.content.ContextCompat
+import android.Manifest
 
 private const val FORMATO_FECHA = "EEE, MMM, dd"
 
@@ -44,6 +46,16 @@ class CrimenFragment : Fragment() {
         ActivityResultContracts.PickContact()
     ) { uri: Uri? ->
         uri?.let { obtenerContactoSeleccionado(it) }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            realizarLlamada()
+        } else {
+            Toast.makeText(requireContext(), "Permiso denegado para leer contactos", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -159,6 +171,19 @@ class CrimenFragment : Fragment() {
             btnSeleccionarSospechoso.text = crimen.sospechoso.ifEmpty {
                 getString(R.string.boton_sospechoso)
             }
+            
+            btnLlamarSospechoso.isEnabled = crimen.sospechoso.isNotBlank()
+            btnLlamarSospechoso.setOnClickListener {
+                val hasPermission = ContextCompat.checkSelfPermission(
+                    requireContext(), Manifest.permission.READ_CONTACTS
+                ) == PackageManager.PERMISSION_GRANTED
+                
+                if (hasPermission) {
+                    realizarLlamada()
+                } else {
+                    requestPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
+                }
+            }
         }
     }
 
@@ -228,5 +253,49 @@ class CrimenFragment : Fragment() {
             PackageManager.MATCH_DEFAULT_ONLY
         )
         return resolveActivity != null
+    }
+
+    private fun realizarLlamada() {
+        val crimen = crimenViewModel.crimen.value ?: return
+        if (crimen.sospechoso.isBlank()) return
+        
+        var contactId: String? = null
+        val cursor = requireActivity().contentResolver.query(
+            ContactsContract.Contacts.CONTENT_URI,
+            arrayOf(ContactsContract.Contacts._ID),
+            "${ContactsContract.Contacts.DISPLAY_NAME} = ?",
+            arrayOf(crimen.sospechoso),
+            null
+        )
+        cursor?.use {
+            if (it.moveToFirst()) {
+                contactId = it.getString(0)
+            }
+        }
+        
+        if (contactId != null) {
+            var numero: String? = null
+            val phoneCursor = requireActivity().contentResolver.query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER),
+                "${ContactsContract.CommonDataKinds.Phone.CONTACT_ID} = ?",
+                arrayOf(contactId),
+                null
+            )
+            phoneCursor?.use {
+                if (it.moveToFirst()) {
+                    numero = it.getString(0)
+                }
+            }
+            
+            if (numero != null) {
+                val intentLlamada = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$numero"))
+                startActivity(intentLlamada)
+            } else {
+                Toast.makeText(requireContext(), "El sospechoso no tiene número", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(requireContext(), "No se encontró al sospechoso en contactos", Toast.LENGTH_SHORT).show()
+        }
     }
 }

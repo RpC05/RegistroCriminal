@@ -58,4 +58,10 @@
         android:layout_height="wrap_content"
         android:text="@string/texto_reporte_criminal"/>
 
+    <Button
+        android:id="@+id/btnLlamarSospechoso"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/llamar_sospechoso"/>
+
 </LinearLayout>

@@ -17,6 +17,7 @@
     <string name="texto_reporte_criminal">Enviar Reporte Criminal</string>
     <string name="enviar_reporte">Enviar reporte</string>
     <string name="boton_sospechoso">Seleccionar sospechoso</string>
+    <string name="llamar_sospechoso">Llamar a sospechoso</string>
 
     <string name="reporte_Crimen">%1$s! El crimen fue descubierto en %2$s. %3$s y %4$s.</string>
     <string name="reporte_resuelto">El caso esta resuelto</string>
