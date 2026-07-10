@@ -46,4 +46,16 @@
         android:layout_height="wrap_content"
         android:text="@string/lbl_crimen_resuelto"/>
 
+    <Button
+        android:id="@+id/btnSeleccionarSospechoso"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/texto_sospechoso_crimen"/>
+
+    <Button
+        android:id="@+id/btnEnviarReporte"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/texto_reporte_criminal"/>
+
 </LinearLayout>

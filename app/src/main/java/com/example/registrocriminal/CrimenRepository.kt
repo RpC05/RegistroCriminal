@@ -7,8 +7,16 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.util.UUID
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 private const val DATABASE_NAME = "crimen-database"
+
+val migration_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE Crimen ADD COLUMN sospechoso TEXT NOT NULL DEFAULT ''")
+    }
+}
 
 class CrimenRepository private constructor(
     context: Context,
@@ -19,7 +27,7 @@ class CrimenRepository private constructor(
             context.applicationContext,
             CrimenDatabase::class.java,
             DATABASE_NAME
-    ).build()
+    ).addMigrations(migration_1_2).build()
 
     fun getCrimenes(): Flow<List<Crimen>> = database.crimenDAO().getCrimenes()
 

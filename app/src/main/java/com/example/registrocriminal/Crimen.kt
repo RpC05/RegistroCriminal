@@ -11,5 +11,6 @@ data class Crimen(
     var titulo: String = "",
     var fecha: Date = Date(),
     var resuelto: Boolean = false,
-    var crimenMayor: Boolean = false
+    var crimenMayor: Boolean = false,
+    var sospechoso: String = ""
 )

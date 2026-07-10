@@ -12,4 +12,16 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <!-- TODO: Remove or change this placeholder text -->
+
+    <string name="texto_sospechoso_crimen">Seleccionar Sospechoso</string>
+    <string name="texto_reporte_criminal">Enviar Reporte Criminal</string>
+    <string name="enviar_reporte">Enviar reporte</string>
+    <string name="boton_sospechoso">Seleccionar sospechoso</string>
+
+    <string name="reporte_Crimen">%1$s! El crimen fue descubierto en %2$s. %3$s y %4$s.</string>
+    <string name="reporte_resuelto">El caso esta resuelto</string>
+    <string name="reporte_no_resuelto">El caso no esta resuelto</string>
+    <string name="reporte_sin_sospechoso">no hay sospechoso</string>
+    <string name="reporte_con_sospechoso">el sospechoso es %s.</string>
+    <string name="reporte_asunto">el sospechoso es.</string>
 </resources>
